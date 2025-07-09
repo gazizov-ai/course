@@ -1,14 +1,13 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 SECRET_KEY = "django-insecure-_iugns49oc$_e((b6sp_5&7dqq2vgcydm!ca#pmq%a*a+@=@#f"
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -18,14 +17,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django",
+    "django_celery_beat",
     "drf_spectacular",
     "rest_framework",
     "django_filters",
     "corsheaders",
     "silk",
-    'chat.apps.ChatConfig',
-    'course.apps.CourseConfig',
-    'users.apps.UsersConfig',
+    'education_app.chat.apps.ChatConfig',
+    'education_app.course.apps.CourseConfig',
+    'education_app.users.apps.UsersConfig',
     'rest_framework.authtoken',
     'celery',
 ]
@@ -83,7 +83,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -113,12 +112,56 @@ REST_FRAMEWORK = {
     ],
 }
 
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Education API',
     'DESCRIPTION': 'API for Education',
     'VERSION': '1.0.0',
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name} — {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'course': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'chat': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
+}

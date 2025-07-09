@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .models import Chat, ChatParticipant, Message
+from .services import create_chat
 
 User = get_user_model()
 
@@ -29,12 +30,12 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'text', 'image', 'file', 'created_at']
+        fields = ['id', 'sender', 'text', 'created_at']
         read_only_fields = ['id', 'sender', 'created_at']
 
 
 class ChatSerializer(serializers.ModelSerializer):
-    participants = ChatParticipantSerializer(many=True, read_only=True)
+    participants = UserSerializer(many=True, read_only=True)
     messages = MessageSerializer(many=True, read_only=True)
 
     class Meta:
@@ -60,6 +61,31 @@ class CreateChatSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict[str, typing.Any]) -> Chat:
         user_ids = validated_data.pop('user_ids')
-        chat = Chat.objects.create(**validated_data)
-        ChatParticipant.objects.bulk_create([ChatParticipant(chat=chat, user_id=uid) for uid in user_ids])
-        return chat
+        return create_chat(validated_data['name'], validated_data['is_group'], user_ids)
+
+    def update(self, instance: Chat, validated_data: dict[str, typing.Any]) -> Chat:
+        user_ids = validated_data.pop('user_ids', [])
+        instance.name = validated_data.get('name', instance.name)
+        instance.is_group = validated_data.get('is_group', instance.is_group)
+        instance.save()
+
+        ChatParticipant.objects.filter(chat=instance).delete()
+        ChatParticipant.objects.bulk_create([ChatParticipant(chat=instance, user_id=uid) for uid in user_ids])
+
+        return instance
+
+class ChatParticipantSerializer(serializers.ModelSerializer):
+    user = ChatUserSerializer(read_only=True)
+
+    class Meta:
+        model = ChatParticipant
+        fields = ['user', 'joined_at']
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    participants = ChatParticipantSerializer(many=True, read_only=True)
+    messages = MessageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Chat
+        fields = ['id', 'name', 'is_group', 'created_at', 'participants', 'messages']

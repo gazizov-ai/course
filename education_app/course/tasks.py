@@ -4,21 +4,33 @@ from datetime import timedelta
 from celery import shared_task
 from django.utils import timezone
 
-from chat.models import ChatParticipant, Message
-from course.models import Course
+from education_app.chat.models import ChatParticipant, Message
+from education_app.course.models import Course
 
 logger = logging.getLogger(__name__)
 
+
+@shared_task
+def clean_all_expired_courses() -> None:
+    now = timezone.now()
+
+    courses = Course.objects.all()
+
+    for course in courses:
+        threshold = now - timedelta(days=course.duration_days)
+
+        if course.end_datetime and course.end_datetime < threshold:
+            clean_expired_enrollments.delay(course.id)
 
 @shared_task
 def clean_expired_enrollments(course_id: int) -> None:
     try:
         course = Course.objects.get(id=course_id)
     except Course.DoesNotExist:
-        logger.error(f'Курс с ID {course_id} не найден.')
+        logger.exception(f'Курс с ID {course_id} не найден.')
         return
 
-    if course.end_datetime < timezone.now() - timedelta(days=30):
+    if course.end_datetime < timezone.now() - timedelta(days=course.duration_days):
         chat = getattr(course, 'chat', None)
         if chat:
             ChatParticipant.objects.filter(chat=chat).delete()

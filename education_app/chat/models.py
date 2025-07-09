@@ -12,21 +12,39 @@ class Chat(models.Model):
 
 
 class ChatParticipant(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='participants')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='chat_participations'
+    )
+    chat = models.ForeignKey(
+        Chat,
+        on_delete=models.CASCADE,
+        related_name='participants'
+    )
     joined_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'{self.user} in {self.chat}'
 
     class Meta:
         unique_together = ('user', 'chat')
 
+
 class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='messages')
     text = models.TextField(blank=True)
-    image = models.ImageField(upload_to='chat_images/', blank=True, null=True)
-    file = models.FileField(upload_to='chat_files/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f'{self.sender.username}: {self.text[:30]}'
 
+
+class MessageAttachment(models.Model):
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to='chat_files/', blank=True, null=True)
+    image = models.ImageField(upload_to='chat_images/', blank=True, null=True)
+
+    def __str__(self):
+        return f'Attachment for message {self.message.id}'

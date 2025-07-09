@@ -2,10 +2,9 @@ import typing
 
 from rest_framework import serializers
 
-from chat.models import ChatParticipant
-from course.models import Course
-
+from education_app.course.models import Course
 from .models import User
+from .services import create_user, update_user, set_courses_and_chats
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,29 +36,11 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def _set_courses_and_chat(self, user: User, courses: list[Course]) -> None:
-        user.courses.set(courses)
-        for course in courses:
-            if course.chat:
-                ChatParticipant.objects.get_or_create(chat=course.chat, user=user)
+        if courses:
+            set_courses_and_chats(user, courses)
 
     def create(self, validated_data: dict[str, typing.Any]) -> User:
-        courses = validated_data.pop('courses', [])
-        password = validated_data.pop('password')
-        user = User.objects.create(**validated_data)
-        user.set_password(password)
-        user.save()
-        if courses:
-            self._set_courses_and_chat(user, courses)
-        return user
+        return create_user(validated_data)
 
     def update(self, instance: User, validated_data: dict[str, typing.Any]) -> User:
-        courses = validated_data.pop('courses', None)
-        password = validated_data.pop('password', None)
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        if password:
-            instance.set_password(password)
-        instance.save()
-        if courses is not None:
-            self._set_courses_and_chat(instance, courses)
-        return instance
+        return update_user(instance, validated_data)

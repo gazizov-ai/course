@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics, serializers
+from rest_framework import generics, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
@@ -12,13 +13,18 @@ from .serializers import CreateChatSerializer, ChatSerializer, EmptySerializer,M
 User = get_user_model()
 
 
-class ChatListCreateView(generics.ListCreateAPIView):
-    serializer_class = ChatSerializer
+class ChatViewSet(viewsets.ModelViewSet):
+    queryset = Chat.objects.all().prefetch_related('participants', 'messages')
 
     def get_permissions(self):
-        if self.request.method == 'POST':
+        if self.action in ['create', 'add_participant', 'remove_participant']:
             return [IsAdminUser()]
         return [IsAuthenticated()]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CreateChatSerializer
+        return ChatSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -26,28 +32,14 @@ class ChatListCreateView(generics.ListCreateAPIView):
             return Chat.objects.all().prefetch_related('participants', 'messages')
         return Chat.objects.filter(participants__user=user).prefetch_related('participants', 'messages')
 
-    def get_serializer_class(self) -> type[serializers.ModelSerializer]:
-        if self.request.method == 'POST':
-            return CreateChatSerializer
-        return ChatSerializer
-
-
-class ChatDetailView(generics.RetrieveAPIView):
-    queryset = Chat.objects.all().prefetch_related('participants', 'messages')
-    serializer_class = ChatSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class AddParticipantView(generics.GenericAPIView):
-    permission_classes = [IsAdminUser]
-    serializer_class = EmptySerializer
-
-    def post(self, request: Request, chat_id: int, user_id: int) -> Response:
+    @action(detail=True, methods=['post'], url_path='add-participant', serializer_class=EmptySerializer)
+    def add_participant(self, request: Request, pk: int) -> Response:
+        user_id = request.query_params.get('user_id')
         if not user_id:
             return Response({'error': 'user_id is required'}, status=400)
 
         try:
-            chat = Chat.objects.get(pk=chat_id)
+            chat = Chat.objects.get(pk=pk)
         except Chat.DoesNotExist:
             return Response({'error': 'Chat not found'}, status=404)
 
@@ -56,18 +48,17 @@ class AddParticipantView(generics.GenericAPIView):
 
         participant = ChatParticipant.objects.create(chat=chat, user_id=user_id)
         from .serializers import ChatParticipantSerializer
-
         serializer = ChatParticipantSerializer(participant)
         return Response(serializer.data, status=201)
 
+    @action(detail=True, methods=['post'], url_path='remove-participant', serializer_class=EmptySerializer)
+    def remove_participant(self, request: Request, pk: int) -> Response:
+        user_id = request.query_params.get('user_id')
+        if not user_id:
+            return Response({'error': 'user_id is required'}, status=400)
 
-class RemoveParticipantView(generics.GenericAPIView):
-    permission_classes = [IsAdminUser]
-    serializer_class = EmptySerializer
-
-    def post(self, request: Request, chat_id: int, user_id: int) -> Response:
         try:
-            participant = ChatParticipant.objects.get(chat_id=chat_id, user_id=user_id)
+            participant = ChatParticipant.objects.get(chat_id=pk, user_id=user_id)
             participant.delete()
             return Response({'status': 'participant removed'})
         except ChatParticipant.DoesNotExist:

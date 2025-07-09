@@ -1,10 +1,8 @@
 import typing
 
 from rest_framework import serializers
-
-from chat.models import Chat, ChatParticipant
-
 from .models import Course, Module
+from .services import create_course_with_users_and_chat
 
 
 class UpdateCourseUsersSerializer(serializers.Serializer):
@@ -43,15 +41,4 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'end_datetime']
 
     def create(self, validated_data: dict[str, typing.Any]) -> Course:
-        users_data = validated_data.pop('users', [])
-        course = Course.objects.create(**validated_data)
-
-        chat = Chat.objects.create(name=course.title, is_group=True)
-        course.chat = chat
-        course.save()
-
-        if users_data:
-            course.users.set(users_data)
-            ChatParticipant.objects.bulk_create([ChatParticipant(chat=chat, user=user) for user in users_data])
-
-        return course
+        return create_course_with_users_and_chat(validated_data)

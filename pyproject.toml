@@ -17,5 +17,12 @@ dependencies = [
     "gunicorn>=23.0.0",
     "pillow>=11.3.0",
     "celery>=5.5.3",
-    "redis>=6.2.0"
+    "redis>=6.2.0",
+    "cron-descriptor==1.4.5",
+    "django-celery-beat==2.8.1",
+    "django-timezone-field==7.1",
+    "python-crontab==3.2.0"
 ]
+
+[tool.uv]
+index-url = "http://pypi-mirror.itcodegroup.ru/simple/"

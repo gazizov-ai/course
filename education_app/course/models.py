@@ -3,7 +3,7 @@ from typing import Any
 from django.db import models
 from django.utils import timezone
 
-from chat.models import Chat
+from education_app.chat.models import Chat
 
 
 class Course(models.Model):
@@ -13,7 +13,7 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     duration_days = models.PositiveIntegerField(verbose_name='Длительность курса (в днях)', default=30)
     end_datetime = models.DateTimeField(null=True, blank=True, verbose_name='Дата и время окончания курса')
-    chat = models.OneToOneField(Chat, on_delete=models.CASCADE, null=True, blank=True, related_name='course')
+    chat = models.OneToOneField(Chat,on_delete=models.SET_NULL, null=True, blank=True, related_name='course')
 
     def __str__(self) -> str:
         return self.title

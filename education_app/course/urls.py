@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from course.views import CourseViewSet, ModuleViewSet
+from education_app.course.views import CourseViewSet, ModuleViewSet
 
 from . import views
 

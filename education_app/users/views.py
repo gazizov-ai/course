@@ -1,7 +1,7 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import permissions, viewsets
 
-from . import models, serializers
+from education_app.users import models, serializers
 
 
 @extend_schema(
@@ -26,9 +26,12 @@ from . import models, serializers
 class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = [permissions.IsAdminUser]
 
     def get_permissions(self):
         if self.action == "create":
             return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
+        elif self.action == "retrieve":
+            return [permissions.IsAuthenticated()]
+        elif self.action in ["update", "partial_update", "destroy", "list"]:
+            return [permissions.IsAdminUser()]
+        return super().get_permissions()
