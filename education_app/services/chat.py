@@ -1,4 +1,4 @@
-from .models import Chat, ChatParticipant
+from education_app.models.chat import Chat, ChatParticipant
 
 
 class ChatService:

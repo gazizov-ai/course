@@ -1,6 +1,6 @@
-from education_app.chat.models import ChatParticipant
-from education_app.course.models import Course
-from .models import User
+from education_app.models.chat import ChatParticipant
+from education_app.models.course import Course
+from education_app.models.users import User
 
 
 def set_courses_and_chats(user: User, courses: list[Course]) -> None:

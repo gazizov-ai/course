@@ -8,11 +8,11 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from education_app.course.tasks import clean_expired_enrollments
+from education_app.tasks import clean_expired_enrollments
 
-from .models import Course, Module
-from .serializers import CourseSerializer, ModuleSerializer
-from .services import update_course_users_in_service
+from education_app.models.course import Course, Module
+from education_app.serializers.course import CourseSerializer, ModuleSerializer
+from education_app.services.course import update_course_users_in_service
 
 
 class CourseViewSet(viewsets.ModelViewSet):

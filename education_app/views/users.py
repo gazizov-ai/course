@@ -1,12 +1,14 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import permissions, viewsets
 
-from education_app.users import models, serializers
+from education_app.models.users import User
+from education_app.serializers.users import UserSerializer
+
 
 
 @extend_schema(
-    request=serializers.UserSerializer,
-    responses={201: serializers.UserSerializer},
+    request=UserSerializer,
+    responses={201: UserSerializer},
     examples=[
         OpenApiExample(
             'User creation example',
@@ -24,8 +26,8 @@ from education_app.users import models, serializers
     ],
 )
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = models.User.objects.all()
-    serializer_class = serializers.UserSerializer
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
     def get_permissions(self):
         if self.action == "create":

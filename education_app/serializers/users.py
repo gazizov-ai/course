@@ -2,9 +2,9 @@ import typing
 
 from rest_framework import serializers
 
-from education_app.course.models import Course
-from .models import User
-from .services import create_user, update_user, set_courses_and_chats
+from education_app.models.course import Course
+from education_app.models.users import User
+from education_app.services.users import create_user, update_user, set_courses_and_chats
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
+        fields = (
             'id',
             'username',
             'email',
@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
             'course_ids',
             'courses',
-        ]
+        )
         extra_kwargs = {
             'email': {'required': True},
             'first_name': {'required': True},

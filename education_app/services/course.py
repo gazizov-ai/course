@@ -1,7 +1,7 @@
 import typing
 from django.utils import timezone
-from education_app.chat.models import Chat, ChatParticipant
-from .models import Course
+from education_app.models.chat import Chat, ChatParticipant
+from education_app.models.course import Course
 
 
 def save_course(course: Course) -> None:

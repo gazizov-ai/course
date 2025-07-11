@@ -23,9 +23,7 @@ INSTALLED_APPS = [
     "django_filters",
     "corsheaders",
     "silk",
-    'education_app.chat.apps.ChatConfig',
-    'education_app.course.apps.CourseConfig',
-    'education_app.users.apps.UsersConfig',
+    'education_app',
     'rest_framework.authtoken',
     'celery',
 ]
@@ -95,7 +93,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'education_app.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

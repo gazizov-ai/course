@@ -3,8 +3,8 @@ import typing
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Chat, ChatParticipant, Message
-from .services import ChatService
+from education_app.models.chat import Chat, ChatParticipant, Message
+from education_app.services.chat import ChatService
 
 User = get_user_model()
 
@@ -35,7 +35,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
-    participants = UserSerializer(many=True, read_only=True)
+    participants = ChatParticipantSerializer(many=True, read_only=True)
     messages = MessageSerializer(many=True, read_only=True)
 
     class Meta:

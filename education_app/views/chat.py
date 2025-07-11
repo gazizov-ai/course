@@ -1,15 +1,17 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
-from .models import Chat, ChatParticipant
-from .serializers import CreateChatSerializer, ChatSerializer,MessageSerializer
-from .serializers import ChatParticipantSerializer
+from education_app.models.chat import Chat, ChatParticipant
+from education_app.serializers.chat import CreateChatSerializer, ChatSerializer, MessageSerializer, \
+    ChatParticipantSerializer
 
 User = get_user_model()
 
@@ -33,36 +35,58 @@ class ChatViewSet(viewsets.ModelViewSet):
             return Chat.objects.all().prefetch_related('participants', 'messages')
         return Chat.objects.filter(participants__user=user).prefetch_related('participants', 'messages')
 
+    from rest_framework.exceptions import ValidationError, NotFound
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='user_id', required=True, type=int,
+                location=OpenApiParameter.QUERY,
+                description='ID пользователя для добавления в чат'
+            )
+        ]
+    )
     @action(detail=True, methods=['post'], url_path='add-participant')
     def add_participant(self, request: Request, pk: int) -> Response:
         user_id = request.query_params.get('user_id')
         if not user_id:
-            return Response({'error': 'user_id is required'}, status=400)
+            raise ValidationError({'user_id': 'Параметр обязателен'})
 
         try:
             chat = Chat.objects.get(pk=pk)
         except Chat.DoesNotExist:
-            return Response({'error': 'Chat not found'}, status=404)
+            raise NotFound('Чат не найден')
 
         if ChatParticipant.objects.filter(chat=chat, user_id=user_id).exists():
-            return Response({'error': 'User is already a participant'}, status=400)
+            raise ValidationError({'user_id': 'Пользователь уже участвует в чате'})
 
         participant = ChatParticipant.objects.create(chat=chat, user_id=user_id)
+        participant = ChatParticipant.objects.select_related('user').get(id=participant.id)
         serializer = ChatParticipantSerializer(participant)
         return Response(serializer.data, status=201)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='user_id', required=True, type=int,
+                location=OpenApiParameter.QUERY,
+                description='ID пользователя для удаления'
+            )
+        ]
+    )
     @action(detail=True, methods=['post'], url_path='remove-participant')
     def remove_participant(self, request: Request, pk: int) -> Response:
         user_id = request.query_params.get('user_id')
         if not user_id:
-            return Response({'error': 'user_id is required'}, status=400)
+            raise ValidationError({'user_id': 'Параметр обязателен'})
 
         try:
             participant = ChatParticipant.objects.get(chat_id=pk, user_id=user_id)
-            participant.delete()
-            return Response({'status': 'participant removed'})
         except ChatParticipant.DoesNotExist:
-            return Response({'error': 'Participant not found'}, status=404)
+            raise NotFound('Участник не найден')
+
+        participant.delete()
+        return Response({'status': 'Участник удалён'})
 
 
 class MessageCreateView(generics.CreateAPIView):

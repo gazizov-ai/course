@@ -3,7 +3,7 @@ from typing import Any
 from django.db import models
 from django.utils import timezone
 
-from education_app.chat.models import Chat
+from education_app.models.chat import Chat
 
 
 class Course(models.Model):

@@ -4,8 +4,8 @@ from datetime import timedelta
 from celery import shared_task
 from django.utils import timezone
 
-from education_app.chat.models import ChatParticipant, Message
-from education_app.course.models import Course
+from education_app.models.chat import ChatParticipant, Message
+from education_app.models.course import Course
 
 logger = logging.getLogger(__name__)
 

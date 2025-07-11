@@ -1,8 +1,8 @@
 import typing
 
 from rest_framework import serializers
-from .models import Course, Module
-from .services import create_course_with_users_and_chat
+from education_app.models.course import Course, Module
+from education_app.services.course import create_course_with_users_and_chat
 
 
 class UpdateCourseUsersSerializer(serializers.Serializer):
@@ -16,7 +16,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'course', 'avatar', 'title', 'content', 'order']
+        fields = ('id', 'course', 'avatar', 'title', 'content', 'order')
         read_only_fields = ['id']
 
 
