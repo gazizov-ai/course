@@ -12,7 +12,7 @@ from education_app.tasks import clean_expired_enrollments
 
 from education_app.models.course import Course, Module
 from education_app.serializers.course import CourseSerializer, ModuleSerializer
-from education_app.services.course import update_course_users_in_service
+from education_app.services.course import CourseService
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -64,7 +64,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         course = self.get_object()
         user_ids = request.data.get('user_ids', [])
 
-        update_course_users_in_service(course, user_ids)
+        CourseService.update_course_users(course, user_ids)
 
         return Response({'status': 'users updated successfully'})
 

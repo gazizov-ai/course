@@ -2,7 +2,7 @@ import typing
 
 from rest_framework import serializers
 from education_app.models.course import Course, Module
-from education_app.services.course import create_course_with_users_and_chat
+from education_app.services.course import CourseService
 
 
 class UpdateCourseUsersSerializer(serializers.Serializer):
@@ -41,4 +41,4 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'end_datetime']
 
     def create(self, validated_data: dict[str, typing.Any]) -> Course:
-        return create_course_with_users_and_chat(validated_data)
+        return CourseService.create_course_with_users_and_chat(validated_data)

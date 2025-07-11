@@ -3,9 +3,9 @@ from django.db import models
 
 
 class Chat(models.Model):
-    name = models.CharField(max_length=255, blank=True,verbose_name='Название')
-    is_group = models.BooleanField('Групповой чат',default=False)
-    created_at = models.DateTimeField('Дата создания',auto_now_add=True)
+    name = models.CharField(max_length=255, blank=True, verbose_name='Название')
+    is_group = models.BooleanField('Групповой чат', default=False)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name or f'{"Группа" if self.is_group else "Приватная"} Чат #{self.id}'
@@ -13,6 +13,7 @@ class Chat(models.Model):
     class Meta:
         verbose_name = 'Чат'
         verbose_name_plural = 'Чаты'
+
 
 class ChatParticipant(models.Model):
     user = models.ForeignKey(
@@ -39,10 +40,11 @@ class ChatParticipant(models.Model):
 
 
 class Message(models.Model):
-    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages',verbose_name='Чат')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT , related_name='messages',verbose_name='Отправитель')
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages', verbose_name='Чат')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='messages',
+                               verbose_name='Отправитель')
     text = models.TextField(blank=True, verbose_name='Текст')
-    created_at = models.DateTimeField('Дата отправки',auto_now_add=True)
+    created_at = models.DateTimeField('Дата отправки', auto_now_add=True)
 
     def __str__(self) -> str:
         return f'{self.sender.username}: {self.text[:300]}'
@@ -51,6 +53,7 @@ class Message(models.Model):
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
         ordering = ['-id']
+
 
 class MessageAttachment(models.Model):
     message = models.ForeignKey(Message, verbose_name='Сообщения', on_delete=models.CASCADE, related_name='attachments')

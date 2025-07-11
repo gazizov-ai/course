@@ -1,11 +1,13 @@
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
     path('api/chat/', include('education_app.urls.chat')),
     path('api/course/', include('education_app.urls.course')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

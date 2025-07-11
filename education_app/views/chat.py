@@ -12,6 +12,7 @@ from rest_framework.serializers import BaseSerializer
 from education_app.models.chat import Chat, ChatParticipant
 from education_app.serializers.chat import CreateChatSerializer, ChatSerializer, MessageSerializer, \
     ChatParticipantSerializer
+from education_app.services.chat import ChatService
 
 User = get_user_model()
 
@@ -35,7 +36,28 @@ class ChatViewSet(viewsets.ModelViewSet):
             return Chat.objects.all().prefetch_related('participants', 'messages')
         return Chat.objects.filter(participants__user=user).prefetch_related('participants', 'messages')
 
-    from rest_framework.exceptions import ValidationError, NotFound
+    def create(self, request: Request, *args, **kwargs) -> Response:
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_ids = serializer.validated_data.pop('user_ids')
+        name = serializer.validated_data.get('name', '')
+        is_group = serializer.validated_data.get('is_group', False)
+
+        chat = ChatService.create_chat(name=name, is_group=is_group, user_ids=user_ids)
+        return Response(ChatSerializer(chat).data, status=201)
+
+    def update(self, request: Request, *args, **kwargs) -> Response:
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_ids = serializer.validated_data.pop('user_ids', [])
+        name = serializer.validated_data.get('name', instance.name)
+        is_group = serializer.validated_data.get('is_group', instance.is_group)
+
+        chat = ChatService.update_chat(instance, name, is_group, user_ids)
+        return Response(ChatSerializer(chat).data)
 
     @extend_schema(
         parameters=[
