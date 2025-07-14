@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.db import models
 
+from base.models import BaseModel
 
-class Chat(models.Model):
+class Chat(BaseModel):
     name = models.CharField(max_length=255, blank=True, verbose_name='Название')
     is_group = models.BooleanField('Групповой чат', default=False)
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name or f'{"Группа" if self.is_group else "Приватная"} Чат #{self.id}'
@@ -39,12 +39,11 @@ class ChatParticipant(models.Model):
         verbose_name_plural = 'Участники чата'
 
 
-class Message(models.Model):
+class Message(BaseModel):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages', verbose_name='Чат')
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='messages',
                                verbose_name='Отправитель')
     text = models.TextField(blank=True, verbose_name='Текст')
-    created_at = models.DateTimeField('Дата отправки', auto_now_add=True)
 
     def __str__(self) -> str:
         return f'{self.sender.username}: {self.text[:300]}'
