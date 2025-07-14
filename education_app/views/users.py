@@ -1,9 +1,9 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import permissions, viewsets
+from rest_framework.exceptions import PermissionDenied
 
 from education_app.models.users import User
 from education_app.serializers.users import UserSerializer
-
 
 
 @extend_schema(
@@ -35,5 +35,23 @@ class UserViewSet(viewsets.ModelViewSet):
         elif self.action == "retrieve":
             return [permissions.IsAuthenticated()]
         elif self.action in ["update", "partial_update", "destroy", "list"]:
-            return [permissions.IsAdminUser()]
+            return [permissions.IsAuthenticated()]
         return super().get_permissions()
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if not request.user.is_staff:
+            if instance != request.user:
+                raise PermissionDenied("Вы можете обновлять только свой профиль.")
+
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if not request.user.is_staff:
+            if instance != request.user:
+                raise PermissionDenied("Вы можете обновлять только свой профиль.")
+
+        return super().partial_update(request, *args, **kwargs)
