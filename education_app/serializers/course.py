@@ -19,7 +19,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer
+    answers = AnswerSerializer(many=True, read_only=True)
 
     class Meta:
         model = Question
@@ -43,7 +43,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'course', 'avatar', 'title', 'content', 'order', 'lessons']
+        fields = ('id', 'course', 'avatar', 'title', 'content', 'order', 'lessons')
         read_only_fields = ['id']
 
 
@@ -51,15 +51,6 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = '__all__'
-        read_only_fields = ['id']
-
-
-class ModuleSerializer(serializers.ModelSerializer):
-    avatar = serializers.ImageField(required=False, allow_null=True)
-
-    class Meta:
-        model = Module
-        fields = ('id', 'course', 'avatar', 'title', 'content', 'order')
         read_only_fields = ['id']
 
 

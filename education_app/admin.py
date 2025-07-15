@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 
 from education_app.models.chat import Chat, ChatParticipant, Message
-from education_app.models.course import Course, Module
+from education_app.models.course import Course, Module, Lesson, Question, Answer
 from education_app.models.users import User
 
 
@@ -33,6 +33,9 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Module)
+admin.site.register(Lesson)
+admin.site.register(Question)
+admin.site.register(Answer)
 
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'phone', 'is_staff')
