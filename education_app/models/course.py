@@ -14,11 +14,15 @@ class Tag(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
 
 class Course(BaseModel):
     title = models.CharField(max_length=50, verbose_name='Название курса')
     description = models.TextField(verbose_name='Описание курса', null=True)
-    tags = models.ManyToManyField(Tag, related_name='courses')
+    tags = models.ManyToManyField(Tag, related_name='courses', blank=True)
     avatar = models.ImageField(upload_to='course_avatars/', blank=True, null=True)
     duration_days = models.PositiveIntegerField(verbose_name='Длительность курса (в днях)', default=30)
     end_datetime = models.DateTimeField(null=True, blank=True, verbose_name='Дата и время окончания курса')
@@ -59,11 +63,15 @@ class Lesson(models.Model):
     avatar = models.ImageField(upload_to='lesson_avatars/', blank=True, null=True)
     title = models.CharField(max_length=50, verbose_name='Название урока')
     content = models.TextField(verbose_name='Содержимое урока')
-    questions = models.ManyToManyField('education_app.Question', related_name='questions')
+    questions = models.ManyToManyField('education_app.Question', related_name='questions', blank=True)
     type = models.CharField(max_length=20, choices=TaskType.choices, default=TaskType.LECTURE, verbose_name='Тип урока')
 
     def __str__(self):
         return f'{self.type}: {self.title}'
+
+    class Meta:
+        verbose_name = 'Урок'
+        verbose_name_plural = 'Уроки'
 
 
 class Question(models.Model):
@@ -73,8 +81,16 @@ class Question(models.Model):
     def __str__(self):
         return f'{self.title}'
 
+    class Meta:
+        verbose_name = 'Вопрос'
+        verbose_name_plural = 'Вопросы'
+
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     content = models.TextField(verbose_name='Текст ответа')
     is_correct = models.BooleanField(default=False, verbose_name='Правильный ответ')
+
+    class Meta:
+        verbose_name = 'Ответ'
+        verbose_name_plural = 'Ответы'
