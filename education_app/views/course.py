@@ -11,7 +11,9 @@ from rest_framework.response import Response
 from education_app.tasks import clean_expired_enrollments
 
 from education_app.models.course import Course, Module, Lesson, Question, Answer, Tag
-from education_app.serializers.course import CourseSerializer, ModuleSerializer, LessonSerializer, QuestionSerializer, AnswerSerializer, TagSerializer
+from education_app.serializers.course import (CourseSerializer, ModuleSerializer,  ModuleShortSerializer,
+                                              LessonSerializer, LessonShortSerializer, QuestionSerializer,
+                                              AnswerSerializer, TagSerializer)
 from education_app.services.course import CourseService
 
 
@@ -71,12 +73,20 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 class ModuleViewSet(viewsets.ModelViewSet):
     queryset = Module.objects.all()
-    serializer_class = ModuleSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ModuleShortSerializer
+        return ModuleSerializer
 
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return LessonShortSerializer
+        return LessonSerializer
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
