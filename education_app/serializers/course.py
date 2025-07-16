@@ -37,6 +37,16 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
+class LessonShortSerializer(serializers.ModelSerializer):
+    # question_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='questions')
+    avatar = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Lesson
+        fields = ('id', 'module', 'avatar', 'title', 'type')
+        read_only_fields = ['id']
+
+
 class ModuleSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
     avatar = serializers.ImageField(required=False, allow_null=True)
@@ -44,6 +54,16 @@ class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = ('id', 'course', 'avatar', 'title', 'content', 'order', 'lessons')
+        read_only_fields = ['id']
+
+
+class ModuleShortSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False, allow_null=True)
+    lesson_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='lessons')
+
+    class Meta:
+        model = Module
+        fields = ('id', 'course', 'avatar', 'title', 'order', 'lesson_ids')
         read_only_fields = ['id']
 
 
