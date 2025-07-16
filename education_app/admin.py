@@ -7,40 +7,54 @@ from education_app.models.course import Course, Module
 from education_app.models.users import User
 
 
-
 @admin.register(Chat)
 class ChatAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'is_group', 'created_at')
-    search_fields = ('name',)
+    list_display = ("id", "name", "is_group", "created_at")
+    search_fields = ("name",)
 
 
 @admin.register(ChatParticipant)
 class ChatParticipantAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'chat', 'joined_at')
-    list_filter = ('chat', 'user')
+    list_display = ("id", "user", "chat", "joined_at")
+    list_filter = ("chat", "user")
 
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'chat', 'sender', 'text', 'created_at')
-    list_filter = ('chat', 'sender')
-    search_fields = ('text',)
+    list_display = ("id", "chat", "sender", "text", "created_at")
+    list_filter = ("chat", "sender")
+    search_fields = ("text",)
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ['title', 'end_datetime', 'created_at']
+    list_display = ["title", "end_datetime", "created_at"]
 
 
 admin.site.register(Module)
 
+
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'phone', 'is_staff')
+    list_display = ("username", "email", "first_name", "last_name", "phone", "is_staff")
     fieldsets = (
-        ('Учётные данные', {'fields': ('username', 'password')}),
-        ('Личная информация', {'fields': ('first_name', 'last_name', 'email', 'phone')}),
-        ('Права доступа', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
+        ("Учётные данные", {"fields": ("username", "password")}),
+        (
+            "Личная информация",
+            {"fields": ("first_name", "last_name", "email", "phone")},
+        ),
+        (
+            "Права доступа",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+        ("Важные даты", {"fields": ("last_login", "date_joined")}),
     )
 
 
