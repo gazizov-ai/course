@@ -11,8 +11,8 @@ def set_courses_and_chats(user: User, courses: list[Course]) -> None:
 
 
 def create_user(validated_data: dict) -> User:
-    courses = validated_data.pop("courses", [])
-    password = validated_data.pop("password")
+    courses = validated_data.pop('courses', [])
+    password = validated_data.pop('password')
 
     user = User.objects.create(**validated_data)
     user.set_password(password)
@@ -25,8 +25,8 @@ def create_user(validated_data: dict) -> User:
 
 
 def update_user(instance: User, validated_data: dict) -> User:
-    courses = validated_data.pop("courses", None)
-    password = validated_data.pop("password", None)
+    courses = validated_data.pop('courses', None)
+    password = validated_data.pop('password', None)
 
     for attr, value in validated_data.items():
         setattr(instance, attr, value)
