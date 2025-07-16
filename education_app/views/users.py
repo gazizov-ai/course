@@ -1,9 +1,15 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 from education_app.models.users import User
-from education_app.serializers.users import UserSerializer
+from education_app.serializers.users import UserSerializer, CustomTokenObtainPairSerializer
 
 
 @extend_schema(
@@ -11,15 +17,15 @@ from education_app.serializers.users import UserSerializer
     responses={201: UserSerializer},
     examples=[
         OpenApiExample(
-            'User creation example',
+            "User creation example",
             value={
-                'username': 'username',
-                'password': '<PASSWORD>',
-                'email': 'pochta@mail.ru',
-                'first_name': 'Name',
-                'last_name': 'Lastname',
-                'phone': '79177777777',
-                'course_ids': [1, 2],
+                "username": "username",
+                "password": "<PASSWORD>",
+                "email": "pochta@mail.ru",
+                "first_name": "Name",
+                "last_name": "Lastname",
+                "phone": "79177777777",
+                "course_ids": [1, 2],
             },
             request_only=True,
         )
@@ -55,3 +61,12 @@ class UserViewSet(viewsets.ModelViewSet):
                 raise PermissionDenied("Вы можете обновлять только свой профиль.")
 
         return super().partial_update(request, *args, **kwargs)
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    def me(self, request: Request) -> Response:
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

@@ -1,10 +1,7 @@
-import typing
-
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from education_app.models.chat import Chat, ChatParticipant, Message
-from education_app.services.chat import ChatService
 
 User = get_user_model()
 
@@ -12,7 +9,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username')
+        fields = ("id", "username")
 
 
 class ChatParticipantSerializer(serializers.ModelSerializer):
@@ -22,7 +19,7 @@ class ChatParticipantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatParticipant
-        fields = ('id', 'user', 'joined_at', 'user_id', 'chat_id')
+        fields = ("id", "user", "joined_at", "user_id", "chat_id")
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -30,8 +27,8 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ('id', 'sender', 'text', 'created_at')
-        read_only_fields = ('id', 'sender', 'created_at')
+        fields = ("id", "sender", "text", "created_at")
+        read_only_fields = ("id", "sender", "created_at")
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -40,13 +37,13 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'name', 'is_group', 'created_at', 'participants', 'messages')
+        fields = ("id", "name", "is_group", "created_at", "participants", "messages")
 
 
 class ChatUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username')
+        fields = ("id", "username")
 
 
 class CreateChatSerializer(serializers.ModelSerializer):
@@ -54,4 +51,4 @@ class CreateChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'name', 'is_group', 'user_ids')
+        fields = ("id", "name", "is_group", "user_ids")
