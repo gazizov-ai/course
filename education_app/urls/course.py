@@ -6,7 +6,7 @@ from education_app.views.course import CourseViewSet, ModuleViewSet
 
 router = DefaultRouter()
 router.register('modules', ModuleViewSet, basename='modules')
-router.register('courses', CourseViewSet, basename='courses')
+router.register('', CourseViewSet, basename='courses')
 
 urlpatterns = [
     path('', include(router.urls)),
