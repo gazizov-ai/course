@@ -8,7 +8,7 @@ router.register('', ChatViewSet, basename='chat')
 
 urlpatterns = [
     path(
-        'chats/<int:chat_id>/messages/',
+        '<int:chat_id>/messages/',
         MessageCreateView.as_view(),
         name='message-create',
     ),
