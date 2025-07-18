@@ -17,7 +17,6 @@ from education_app.serializers.course import (
     LessonShortSerializer,
     QuestionSerializer,
     QuestionShortSerializer,
-    AnswerSerializer,
     TagSerializer
 )
 from education_app.services.course import CourseService
