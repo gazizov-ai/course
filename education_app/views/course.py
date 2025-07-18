@@ -105,11 +105,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return QuestionSerializer
 
 
-class AnswerViewSet(viewsets.ModelViewSet):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerSerializer
-
-
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
