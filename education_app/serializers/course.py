@@ -29,6 +29,15 @@ class QuestionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
+class QuestionShortSerializer(serializers.ModelSerializer):
+    answer_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='answers')
+
+    class Meta:
+        model = Question
+        fields = ('id', 'title', 'content', 'answer_ids')
+        read_only_fields = ['id']
+
+
 class LessonSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
     avatar = serializers.ImageField(required=False, allow_null=True)
@@ -40,7 +49,6 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class LessonShortSerializer(serializers.ModelSerializer):
-    # question_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='questions')
     avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:

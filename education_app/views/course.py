@@ -8,17 +8,17 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-<<<<<<< HEAD
-from education_app.models.course import Course, Module
-from education_app.serializers.course import CourseSerializer, ModuleSerializer
-=======
-from education_app.tasks import clean_expired_enrollments
-
-from education_app.models.course import Course, Module, Lesson, Question, Answer, Tag
-from education_app.serializers.course import (CourseSerializer, ModuleSerializer,  ModuleShortSerializer,
-                                              LessonSerializer, LessonShortSerializer, QuestionSerializer,
-                                              AnswerSerializer, TagSerializer)
->>>>>>> 4
+from education_app.models.course import Course, Module, Lesson, Question, Tag
+from education_app.serializers.course import (
+    CourseSerializer,
+    ModuleSerializer,
+    ModuleShortSerializer,
+    LessonSerializer,
+    LessonShortSerializer,
+    QuestionSerializer,
+    QuestionShortSerializer,
+    TagSerializer
+)
 from education_app.services.course import CourseService
 from education_app.tasks import clean_expired_enrollments
 
@@ -97,12 +97,11 @@ class LessonViewSet(viewsets.ModelViewSet):
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
 
-
-class AnswerViewSet(viewsets.ModelViewSet):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerSerializer
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return QuestionShortSerializer
+        return QuestionSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):

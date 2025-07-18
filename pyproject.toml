@@ -11,6 +11,7 @@ dependencies = [
     "django-filter>=25.1",
     "django-silk>=5.4.0",
     "djangorestframework>=3.16.0",
+    "djangorestframework-simplejwt>=5.3.1",
     "drf-spectacular>=0.28.0",
     "pytest>=8.4.1",
     "ruff>=0.12.2",
@@ -25,4 +26,4 @@ dependencies = [
 ]
 
 [tool.uv]
-index-url = "http://pypi-mirror.itcodegroup.ru/simple/"
+index-url = "https://pypi.org/simple"
